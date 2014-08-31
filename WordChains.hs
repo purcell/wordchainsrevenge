@@ -18,7 +18,9 @@ neighbours dict w = S.filter (areNeighbours w) dict
 areNeighbours :: Word -> Word -> Bool
 areNeighbours a b | T.length a /= T.length b = False
 areNeighbours a b | a == b = False
-areNeighbours a b = ((1 ==) . length) $ take 2 $ filter (uncurry (/=)) $ T.zip a b
+areNeighbours a b = isLength1 $ filter (uncurry (/=)) $ T.zip a b
+  where isLength1 [_] = True
+        isLength1 _   = False
 
 
 type Chain = [Word]
