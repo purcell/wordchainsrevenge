@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module WordChains where
+module WordChains (chains, readDict, standardDict) where
 
 import           Data.Set     (Set)
 import qualified Data.Set     as S
