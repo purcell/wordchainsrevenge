@@ -35,11 +35,13 @@ type NeighbourLookup = Word -> Set Word
 dictNeighbourLookup :: Dictionary -> NeighbourLookup
 dictNeighbourLookup dict w = M.findWithDefault S.empty w (neighbourMap dict)
 
+neighbourLookupWithout :: NeighbourLookup -> Word -> NeighbourLookup
+neighbourLookupWithout wrapped exclude = S.delete exclude . wrapped
+
 treeFrom :: NeighbourLookup -> Word -> Tree Chain
 treeFrom nl s = Tr.unfoldTree expand (nl, [s])
   where expand :: (NeighbourLookup, Chain) -> (Chain, [(NeighbourLookup, Chain)])
         expand (nl', c) = (c, [(neighbourLookupWithout nl' n, n : c) | n <- S.toList $ nl' $ head c])
-        neighbourLookupWithout wrapped exclude = S.delete exclude . wrapped
 
 chains :: Dictionary -> Word -> Word -> [Chain]
 chains dict a b = map reverse . filter reachesTarget . concat . Tr.levels $ tree
