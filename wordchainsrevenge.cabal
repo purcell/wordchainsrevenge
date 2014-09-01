@@ -18,6 +18,9 @@ cabal-version:       >=1.10
 
 executable wordchains
   main-is:             Main.hs
+  ghc-options:
+    -O4
+    -threaded
   -- other-modules:
   other-extensions:    OverloadedStrings
   build-depends:       base >=4.7 && <4.8, text >=1.1 && <1.2, containers >=0.5 && <0.6
