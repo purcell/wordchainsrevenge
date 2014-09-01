@@ -1,17 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 module WordChains (chains, readDict, standardDict) where
 
-import           Data.Function   (on)
-import           Data.List       (groupBy, sortBy)
-import qualified Data.Map        as M
-import qualified Data.Map.Strict as MS
-import           Data.Set        (Set)
-import qualified Data.Set        as S
-import           Data.Text       (Text)
-import qualified Data.Text       as T
-import qualified Data.Text.IO    as TIO
-import           Data.Tree       (Tree)
-import qualified Data.Tree       as Tr
+import           Data.Function (on)
+import           Data.List     (groupBy, sortBy)
+import           Data.Map      (Map)
+import qualified Data.Map      as M
+import           Data.Set      (Set)
+import qualified Data.Set      as S
+import           Data.Text     (Text)
+import qualified Data.Text     as T
+import qualified Data.Text.IO  as TIO
+import           Data.Tree     (Tree)
+import qualified Data.Tree     as Tr
 
 type Word = Text
 type Dictionary = Set Word
@@ -26,9 +26,9 @@ neighbourGroups :: Dictionary -> [[Word]]
 neighbourGroups dict = map (map fst) $ groupBy ((==) `on` snd) $ sortBy (compare `on` snd) allWordsAndMasks
   where allWordsAndMasks = concatMap (\w -> [(w, m) | m <- masks w]) $ S.toList dict
 
-neighbourMap :: Dictionary -> MS.Map Word (Set Word)
-neighbourMap dict = foldr (M.unionWith S.union) MS.empty $ concatMap groupMap $ neighbourGroups dict
-  where groupMap ws = [ MS.singleton w (S.fromList [w' | w' <- ws, w' /= w]) | w <- ws ]
+neighbourMap :: Dictionary -> Map Word (Set Word)
+neighbourMap dict = foldr (M.unionWith S.union) M.empty $ concatMap groupMap $ neighbourGroups dict
+  where groupMap ws = [ M.singleton w (S.fromList [w' | w' <- ws, w' /= w]) | w <- ws ]
 
 
 type Chain = [Word]
