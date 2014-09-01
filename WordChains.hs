@@ -1,7 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 module WordChains (chains, readDict, standardDict) where
 
-import           Control.Arrow   ((&&&))
+import           Data.Function   (on)
+import           Data.List       (groupBy, sortBy)
 import qualified Data.Map        as M
 import qualified Data.Map.Strict as MS
 import           Data.Set        (Set)
@@ -15,18 +16,19 @@ import qualified Data.Tree       as Tr
 type Word = Text
 type Dictionary = Set Word
 
-neighbours :: Dictionary -> Word -> Set Word
-neighbours dict w = S.filter (areNeighbours w) dict
+-- | Given "Foo", produce the masks ["_oo", "f_o", "fo_"]
+masks :: Word -> [Word]
+masks = makeMasks . T.toLower
+    where makeMasks w = zipWith (\a b -> T.intercalate "_" [a, b]) (T.inits w) (drop 1 . T.tails $ w)
 
-areNeighbours :: Word -> Word -> Bool
-areNeighbours a b | T.length a /= T.length b = False
-areNeighbours a b | a == b = False
-areNeighbours a b = isLength1 $ filter (uncurry (/=)) $ T.zip a b
-  where isLength1 [_] = True
-        isLength1 _   = False
+-- | Produce a list of words groups which share a mask, and are therefore neighbours
+neighbourGroups :: Dictionary -> [[Word]]
+neighbourGroups dict = map (map fst) $ groupBy ((==) `on` snd) $ sortBy (compare `on` snd) allWordsAndMasks
+  where allWordsAndMasks = concatMap (\w -> [(w, m) | m <- masks w]) $ S.toList dict
 
 neighbourMap :: Dictionary -> MS.Map Word (Set Word)
-neighbourMap dict = M.fromList $ map (id &&& neighbours dict) $ S.toList dict
+neighbourMap dict = foldr (M.unionWith S.union) MS.empty $ concatMap groupMap $ neighbourGroups dict
+  where groupMap ws = [ MS.singleton w (S.fromList [w' | w' <- ws, w' /= w]) | w <- ws ]
 
 
 type Chain = [Word]
