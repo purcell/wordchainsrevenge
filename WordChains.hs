@@ -16,10 +16,14 @@ import qualified Data.Tree     as Tr
 type Word = Text
 type Dictionary = Set Word
 
--- | Given "Foo", produce the masks ["_oo", "f_o", "fo_"]
-masks :: Word -> [Word]
+-- | A pair of (init, tail), e.g. ("ei", "ht"), which is "eight" with a letter omitted.
+-- Words which differ by only one character will have one identical mask.
+type Mask = (Text, Text)
+
+-- | Given "Foo", produce the masks [("", "oo"), ("f", "o"), ("fo", "")]
+masks :: Word -> [Mask]
 masks = makeMasks . T.toLower
-    where makeMasks w = zipWith (\a b -> T.intercalate "_" [a, b]) (T.inits w) (drop 1 . T.tails $ w)
+    where makeMasks w = zip (T.inits w) (drop 1 . T.tails $ w)
 
 -- | Produce a list of words groups which share a mask, and are therefore neighbours
 neighbourGroups :: Dictionary -> [[Word]]
