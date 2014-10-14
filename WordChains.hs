@@ -28,7 +28,7 @@ neighbourGroups dict = map (map fst) $ groupBy ((==) `on` snd) $ sortBy (compare
 
 neighbourMap :: Dictionary -> Map Word (Set Word)
 neighbourMap dict = foldr (M.unionWith S.union) M.empty $ concatMap groupMap $ neighbourGroups dict
-  where groupMap ws = [ M.singleton w (S.fromList [w' | w' <- ws, w' /= w]) | w <- ws ]
+  where groupMap ws = [ M.singleton w (S.fromList $ filter (/= w) ws) | w <- ws ]
 
 
 type Chain = [Word]
